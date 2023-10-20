@@ -2,4 +2,4 @@
 
 [Aufgabenblatt][aufgabe01]
 
-[aufgabe01]: https://luna.informatik.uni-mainz.de/compmod/cm2_assignments/01-Datenstrukturen-und-Kuerzeste-Wege.md
+[aufgabe01]: https://www.staff.uni-mainz.de/frfische/mmr2/01-Datenstrukturen-und-Kuerzeste-Wege.md
