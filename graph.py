@@ -5,13 +5,24 @@ import math
 class PQueue:
     def __init__(self):
         self.items = []
+        self.first = 0
+        self.pos = []
     def push(self,u,value):
-        1
+        self.items.append((u,value))
+        self.pos[u] = len(self.items)
+        self.decrease_Key(u,value)
     def decrease_Key(self,u,value):
-        1
+        j = self.pos[u]
+        while j > self.first and self.items[j - 1][1] > value:
+            self.pos[self.items[j - 1][0]] = j
+            self.items[j] = self.items[j - 1]
+            j -= 1
+        self.items[j] = (u, value)
+        self.pos[u] = j
+        #
     def pop_min(self):
-        1
-
+        self.first += 1
+        return self.items[0]
 def Abstand(l1,b1,l2,b2):#ohne erde
     return math.sqrt((l1-l2)**2+(b1-b2)**2)
 
