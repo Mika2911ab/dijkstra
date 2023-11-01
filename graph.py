@@ -6,10 +6,10 @@ class PQueue:
     def __init__(self):
         self.items = []
         self.first = 0
-        self.pos = []
+        self.pos = {}
     def push(self,u,value):
         self.items.append((u,value))
-        self.pos[u] = len(self.items)
+        self.pos[u] = len(self.items)-1
         self.decrease_Key(u,value)
     def decrease_Key(self,u,value):
         j = self.pos[u]
