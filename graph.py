@@ -22,7 +22,8 @@ class PQueue:
         #
     def pop_min(self):
         self.first += 1
-        return self.items[0]
+        return self.items[self.first-1]
+
 def Abstand(l1,b1,l2,b2):#ohne erde
     return math.sqrt((l1-l2)**2+(b1-b2)**2)
 
@@ -33,7 +34,7 @@ class Graph:
         self.nodevalues = []#kann auch in den tupel wie bei edge für dijkstra anpassen
     def add_node(self,l,b):#nodes müssen in der reihnfolge geadded werden wie sie heißen
         self.nodes += [(l,b,[])]
-        self.nodevalues += []
+        self.nodevalues += [None]
     def add_edge(self,n1,n2):
         (l1,b1, al1) = self.nodes[n1]
         (l2, b2, al2) = self.nodes[n2]
