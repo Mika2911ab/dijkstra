@@ -28,15 +28,6 @@ def ReadCSV(G):
             # nichtmal geschafft linie zu machen ):
             # painter.drawLine(*umrechnen(x1, y1), *umrechnen(x2, y2))
 
-def umrechnen(lg, bg):
-
-
-    # [8.1611,8.3781]min/max längengrad
-    # [49.9468,50.1082]min/max breitengrad
-    # 400 war länge und breite des fensters
-    # ohne erde
-    return (int(((lg - 8.1611) / 0.217) * 400), int(((bg - 49.9468) / 0.1614) * 400))
-
 def Dijksrtra(G, s, t):
     # 0 weiß ,1 grau,2 schwarz
     S = []
@@ -99,6 +90,9 @@ class Window(QWidget, object):
         self.G = Graph()
         ReadCSV(self.G)
 
+        # outer stuff
+        self.calcOuterVal()
+
         # world
         self.world = self.standardMap()
         self.world_img = QImage(self.world.data, 1000, 600, QImage.Format_RGBA8888)
@@ -111,22 +105,45 @@ class Window(QWidget, object):
 
         self.timerFun()
 
-    def drawCons(self):
-        for edge in self.G.edges:
-            node_out = self.G.nodes[edge[0]]
-            node_in = self.G.nodes[edge[1]]
-
-            x1, y1 = umrechnen(node_out[0], node_out[1])
-            x2, y2 = umrechnen(node_in[0], node_in[1])
-
-            self.mappainter.drawLine(x1, y1, x2, y2)
-
     def timerFun(self):
         self.timer = QTimer()
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.onRepeat)
         self.timer.start()
 
+    def calcOuterVal(self):
+        self.minlong = self.G.nodes[0][1]
+        self.maxlong = self.G.nodes[0][1]
+
+        self.maxlat = self.G.nodes[0][0]
+        self.minlat = self.G.nodes[0][0]
+        for i in self.G.nodes:
+            if i[1] < self.minlong:
+                self.minlong = i[1]
+            elif i[1] > self.maxlong:
+                self.maxlong = i[1]
+            if i[0] < self.minlat:
+                self.minlat = i[0]
+            elif i[0] > self.maxlat:
+                self.maxlat = i[0]
+
+    def umrechnen(self, lg, bg):
+
+        # [8.1611,8.3781]min/max längengrad     self.minlat/ self.maxlat
+        # [49.9468,50.1082]min/max breitengrad  self.minlong/ self.maxlong
+        # 400 war länge und breite des fensters
+        # ohne erde
+        return (int(((lg - self.minlat) / 0.217) * self.width), int(((bg - self.minlong) / 0.1614) * self.height))          # ToDo: teilungsfaktoren variable machen
+
+    def drawCons(self):
+        for edge in self.G.edges:
+            node_out = self.G.nodes[edge[0]]
+            node_in = self.G.nodes[edge[1]]
+
+            x1, y1 = self.umrechnen(node_out[0], node_out[1])
+            x2, y2 = self.umrechnen(node_in[0], node_in[1])
+
+            self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
     def standardMap(self):
         # Erstellen eines leeren 2D Numpy-Arrays mit den Dimensionen width x height und 3 Kanälen (RGB)
         world = np.zeros((self.height, self.width, 4), dtype=np.uint8)
@@ -136,14 +153,16 @@ class Window(QWidget, object):
                 world[y, x] = [255, 255, 255, 255]
 
         for i in self.G.nodes:
-            tempx, tempy = umrechnen(float(i[0]), float(i[1]))
-            world[tempy, tempx] = [0, 0, 0, 255]
+            tempx, tempy = self.umrechnen(float(i[0]), float(i[1]))
+            if (self.height-tempy < self.height and tempx < self.width):
+                world[self.height-tempy, tempx] = [0, 0, 0, 255]
 
             for x in range(-self.p_size, self.p_size):
                 for y in range(-self.p_size, self.p_size):
                     tempx2 = tempx + x
                     tempy2 = tempy + y
-                    world[tempy2, tempx2] = [0, 0, 0, 255]
+                    if(self.height-tempy2<self.height and tempx2 < self.width):
+                        world[self.height - tempy2, tempx2] = [0, 0, 0, 255]
 
         return world
     def onRepeat(self):
