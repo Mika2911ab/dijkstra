@@ -86,9 +86,12 @@ class Window(QWidget, object):
         self.form.addWidget(self.display)
         self.setLayout(self.form)
 
-        # hier kommt der Graph shit
+        # hier kommt der Graph
         self.G = Graph()
         ReadCSV(self.G)
+
+        # Zum Auswählen der Punkte
+        self.timesclicked = 0
 
         # outer stuff
         self.calcOuterVal()
@@ -173,6 +176,27 @@ class Window(QWidget, object):
         temppainter = QPainter(self.temp_img)
         #
         self.display.setPixmap((QPixmap.fromImage(self.temp_img)))
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.selectPoint(event.pos())
+
+    def selectPoint(self, pos):
+        pos -= self.display.pos()
+        print(str(pos))
+        # nearest_node = self.findNearestNode(pos)
+        # print(str(nearest_node))
+        if self.timesclicked == 0:
+            self.mappainter.setBrush(QColor(255, 0, 0))
+            self.mappainter.drawEllipse(pos, 5, 5)
+            self.display.setPixmap(QPixmap.fromImage(self.world_img))
+            self.timesclicked = 1
+        elif self.timesclicked == 1:
+            self.mappainter.setBrush(QColor(0, 255, 0))
+            self.mappainter.drawEllipse(pos, 5, 5)
+            self.display.setPixmap(QPixmap.fromImage(self.world_img))
+            self.timesclicked = 2
+
 
 
 def main():
