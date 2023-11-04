@@ -61,7 +61,7 @@ class Window(QWidget, object):
         # Größe der Fläche und point size
         self.width = 1000
         self.height = 600
-        self.p_size = 0
+        self.p_size = 1
 
         # timer
         self.timer = QTimer()
@@ -192,12 +192,12 @@ class Window(QWidget, object):
         print(str(node_y))
         if self.timesclicked == 0:
             self.mappainter.setBrush(QColor(255, 0, 0))
-            self.mappainter.drawEllipse(node_x, node_y, 5, 5)
+            self.mappainter.drawEllipse(node_x, self.height - node_y, 5, 5)
             self.display.setPixmap(QPixmap.fromImage(self.world_img))
             self.timesclicked = 1
         elif self.timesclicked == 1:
             self.mappainter.setBrush(QColor(0, 255, 0))
-            self.mappainter.drawEllipse(node_x, node_y, 5, 5)
+            self.mappainter.drawEllipse(node_x,  self.height - node_y, 5, 5)
             self.display.setPixmap(QPixmap.fromImage(self.world_img))
             self.timesclicked = 2
 
@@ -206,7 +206,7 @@ class Window(QWidget, object):
         nearest_node = None
         for node in self.G.nodes:
             node_x, node_y = self.umrechnen(node[0], node[1])
-            distance = round(math.sqrt((pos.x() - node_x) ** 2 + (pos.y() - node_y) ** 2))
+            distance = round(math.sqrt((pos.x() - node_x) ** 2 + ((self.height - pos.y()) - node_y) ** 2))
             if distance < min_distance:
                 min_distance = distance
                 nearest_node = node
