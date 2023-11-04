@@ -184,19 +184,34 @@ class Window(QWidget, object):
     def selectPoint(self, pos):
         pos -= self.display.pos()
         print(str(pos))
-        # nearest_node = self.findNearestNode(pos)
-        # print(str(nearest_node))
+        nearest_node = self.findNearestNode(pos)
+        print(nearest_node in self.G.nodes)
+        print(str(nearest_node))
+        node_x, node_y = self.umrechnen(nearest_node[0], nearest_node[1])
+        print(str(node_x))
+        print(str(node_y))
         if self.timesclicked == 0:
             self.mappainter.setBrush(QColor(255, 0, 0))
-            self.mappainter.drawEllipse(pos, 5, 5)
+            self.mappainter.drawEllipse(node_x, node_y, 5, 5)
             self.display.setPixmap(QPixmap.fromImage(self.world_img))
             self.timesclicked = 1
         elif self.timesclicked == 1:
             self.mappainter.setBrush(QColor(0, 255, 0))
-            self.mappainter.drawEllipse(pos, 5, 5)
+            self.mappainter.drawEllipse(node_x, node_y, 5, 5)
             self.display.setPixmap(QPixmap.fromImage(self.world_img))
             self.timesclicked = 2
 
+    def findNearestNode(self, pos):
+        min_distance = float('inf')
+        nearest_node = None
+        for node in self.G.nodes:
+            node_x, node_y = self.umrechnen(node[0], node[1])
+            distance = round(math.sqrt((pos.x() - node_x) ** 2 + (pos.y() - node_y) ** 2))
+            if distance < min_distance:
+                min_distance = distance
+                nearest_node = node
+
+        return nearest_node
 
 
 def main():
