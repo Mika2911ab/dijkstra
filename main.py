@@ -50,7 +50,7 @@ def Dijksrtra(G, s, t):
                 G.set_node_value(b, (1, dist + edge_dist, path + [(a, b)]))
             elif (dist + edge_dist < node_dist):
                 P.decrease_Key(b, dist + edge_dist)
-                G.set_node_value(b, (1, dist + edge_dist, path + (a, b)))
+                G.set_node_value(b, (1, dist + edge_dist, path + [(a, b)]))
 
 
 
@@ -61,7 +61,7 @@ class Window(QWidget, object):
         # Größe der Fläche und point size
         self.width = 1000
         self.height = 600
-        self.p_size = 1
+        self.p_size = 0
 
         # timer
         self.timer = QTimer()
@@ -91,7 +91,9 @@ class Window(QWidget, object):
         ReadCSV(self.G)
 
         # Zum Auswählen der Punkte
-        self.timesclicked = 0
+        self.timesClicked = 0
+        self.firstNode = None
+        self.secondNode = None
 
         # outer stuff
         self.calcOuterVal()
@@ -182,24 +184,24 @@ class Window(QWidget, object):
             self.selectPoint(event.pos())
 
     def selectPoint(self, pos):
-        pos -= self.display.pos()
-        print(str(pos))
-        nearest_node = self.findNearestNode(pos)
-        print(nearest_node in self.G.nodes)
-        print(str(nearest_node))
-        node_x, node_y = self.umrechnen(nearest_node[0], nearest_node[1])
-        print(str(node_x))
-        print(str(node_y))
-        if self.timesclicked == 0:
+        if self.timesClicked != 2:
+            pos -= self.display.pos()
+            nearest_node = self.findNearestNode(pos)
+            node_x, node_y = self.umrechnen(nearest_node[0], nearest_node[1])
+        if self.timesClicked == 0:
+            self.firstNode = nearest_node
             self.mappainter.setBrush(QColor(255, 0, 0))
             self.mappainter.drawEllipse(node_x, self.height - node_y, 5, 5)
             self.display.setPixmap(QPixmap.fromImage(self.world_img))
-            self.timesclicked = 1
-        elif self.timesclicked == 1:
+            self.timesClicked = 1
+        elif self.timesClicked == 1:
+            self.secondNode = nearest_node
             self.mappainter.setBrush(QColor(0, 255, 0))
             self.mappainter.drawEllipse(node_x,  self.height - node_y, 5, 5)
             self.display.setPixmap(QPixmap.fromImage(self.world_img))
-            self.timesclicked = 2
+            self.timesClicked = 2
+            # Jetzt Djikstra
+            self.startAlgos()
 
     def findNearestNode(self, pos):
         min_distance = float('inf')
@@ -212,6 +214,28 @@ class Window(QWidget, object):
                 nearest_node = node
 
         return nearest_node
+
+
+    # Ausführen aller implementierten Algorithmen, wenn der Zielknoten ausgewählt wurde
+    def startAlgos(self):
+        ##Djikstra
+        first_node_index = self.G.nodes.index(self.firstNode)
+        second_node_index = self.G.nodes.index(self.secondNode)
+        self.dijPath = Dijksrtra(self.G, first_node_index, second_node_index)
+        print(str(self.dijPath))
+
+
+        for edge in self.dijPath:
+            node_out = self.G.nodes[edge[0]]
+            node_in = self.G.nodes[edge[1]]
+
+            x1, y1 = self.umrechnen(node_out[0], node_out[1])
+            x2, y2 = self.umrechnen(node_in[0], node_in[1])
+
+            self.mappainter.setBrush(QColor(255, 0, 0))
+            self.mappainter.setPen(QPen(QColor(255, 0, 0), 2))  # Stiftbreite 2
+            self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
+
 
 
 def main():
