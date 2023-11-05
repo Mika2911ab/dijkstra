@@ -84,8 +84,19 @@ class Window(QWidget, object):
         palette.setColor(QPalette.Window, QColor(255, 255, 255))  # Set the background color to white
         self.display.setPalette(palette)
 
+        # Slider
+        self.foundPath = False
+        self.sliderVal = 0
+        self.oldSliderVal = 0
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(100)
+        self.slider.setValue(self.sliderVal)
+        self.slider.valueChanged.connect(self.sliderFun)
+
         # Widget und Layout hinzufügen
         self.form.addWidget(self.display)
+        self.form.addWidget(self.slider)
         self.setLayout(self.form)
 
         # hier kommt der Graph
@@ -224,19 +235,19 @@ class Window(QWidget, object):
         first_node_index = self.G.nodes.index(self.firstNode)
         second_node_index = self.G.nodes.index(self.secondNode)
         self.dijPath, self.visitedEdges = Dijkstra(self.G, first_node_index, second_node_index)
-        print(str(self.dijPath))
+        self.foundPath = True
 
-        # alle besuchten Kanten rot markieren
-        for edge in self.visitedEdges:
-            node_out = self.G.nodes[edge[0]]
-            node_in = self.G.nodes[edge[1]]
-
-            x1, y1 = self.umrechnen(node_out[0], node_out[1])
-            x2, y2 = self.umrechnen(node_in[0], node_in[1])
-
-            self.mappainter.setBrush(QColor(255, 0, 0))
-            self.mappainter.setPen(QPen(QColor(255, 0, 0), 1))
-            self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
+        # # alle besuchten Kanten rot markieren
+        # for edge in self.visitedEdges:
+        #     node_out = self.G.nodes[edge[0]]
+        #     node_in = self.G.nodes[edge[1]]
+        #
+        #     x1, y1 = self.umrechnen(node_out[0], node_out[1])
+        #     x2, y2 = self.umrechnen(node_in[0], node_in[1])
+        #
+        #     self.mappainter.setBrush(QColor(255, 0, 0))
+        #     self.mappainter.setPen(QPen(QColor(255, 0, 0), 1))
+        #     self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
 
         # den gefundenen Pfad blau markieren
         for edge in self.dijPath:
@@ -250,6 +261,53 @@ class Window(QWidget, object):
             self.mappainter.setPen(QPen(QColor(0, 0, 255), 2))  # Stiftbreite 2
             self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
 
+
+    def sliderFun(self):
+        if self.foundPath:
+            self.sliderVal = self.slider.value()
+            visitedEdgesLen = len(self.visitedEdges)
+
+            # Edges werden Rot wenn der Slider erhöht wird
+            if self.oldSliderVal < self.sliderVal:
+                for i in range(round(self.oldSliderVal/100 * visitedEdgesLen), round(self.sliderVal/100 * visitedEdgesLen)):
+                    edge = self.visitedEdges[i]
+                    node_out = self.G.nodes[edge[0]]
+                    node_in = self.G.nodes[edge[1]]
+
+                    x1, y1 = self.umrechnen(node_out[0], node_out[1])
+                    x2, y2 = self.umrechnen(node_in[0], node_in[1])
+
+                    self.mappainter.setBrush(QColor(255, 0, 0))
+                    self.mappainter.setPen(QPen(QColor(255, 0, 0), 1))
+                    self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
+
+            # Edges werden schwarz wenn der Slider gesenkt wird
+            elif self.oldSliderVal > self.sliderVal:
+                for i in range(round(self.sliderVal/100 * visitedEdgesLen) + 1, round(self.oldSliderVal/100 * visitedEdgesLen)):
+                    edge = self.visitedEdges[i]
+                    node_out = self.G.nodes[edge[0]]
+                    node_in = self.G.nodes[edge[1]]
+
+                    x1, y1 = self.umrechnen(node_out[0], node_out[1])
+                    x2, y2 = self.umrechnen(node_in[0], node_in[1])
+
+                    self.mappainter.setBrush(QColor(0, 0, 0))
+                    self.mappainter.setPen(QPen(QColor(0, 0, 0), 1))
+                    self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
+
+            self.oldSliderVal = self.sliderVal
+
+            # Den blauen Pfad nochmal drüber, damit man ihn besser sieht
+            for edge in self.dijPath:
+                node_out = self.G.nodes[edge[0]]
+                node_in = self.G.nodes[edge[1]]
+
+                x1, y1 = self.umrechnen(node_out[0], node_out[1])
+                x2, y2 = self.umrechnen(node_in[0], node_in[1])
+
+                self.mappainter.setBrush(QColor(0, 0, 255))
+                self.mappainter.setPen(QPen(QColor(0, 0, 255), 2))  # Stiftbreite 2
+                self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
 
 
 
