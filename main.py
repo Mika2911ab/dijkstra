@@ -14,19 +14,11 @@ def ReadCSV(G):
             node, lg, bg = line.split(',')
             nodedict[node] = len(nodedict)  # gibt keine 2 nodes mit gleichen namen
             G.add_node(float(lg), float(bg))
-            ###Knoten anzeigen
-            # btn = QPushButton(window)
-            # btn.setGeometry(*umrechnen(float(lg),float(bg)),10,10)  # Position und Größe des Buttons
-            # btn.setStyleSheet("background-color: red; border-radius: 5px;")  # Stilvorlage für den Kreis
-    # painter = QPainter(window)
-    # painter.setPen(QPen(QColor('black'),4.0, Qt.PenStyle.SolidLine))
     with open('edges.csv') as file:
         for line in file:
             n1, n2 = line.replace('\n', '').split(',')
             x1, y1, x2, y2 = G.add_edge(nodedict[n1], nodedict[n2])
             # achtung jede edge a,b is auch b,a in der datei (anscheinend)
-            # nichtmal geschafft linie zu machen ):
-            # painter.drawLine(*umrechnen(x1, y1), *umrechnen(x2, y2))
 
 def Dijkstra(G, s, t):
     # 0 weiß ,1 grau,2 schwarz

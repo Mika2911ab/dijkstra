@@ -33,13 +33,13 @@ class Graph:
         self.edges = []
         self.nodevalues = []#kann auch in den tupel wie bei edge für dijkstra anpassen
     def add_node(self,l,b):#nodes müssen in der reihnfolge geadded werden wie sie heißen
-        self.nodes += [(l,b,[])]
-        self.nodevalues += [None]
+        self.nodes.append((l,b,[]))
+        self.nodevalues.append(None)
     def add_edge(self,n1,n2):
         (l1,b1, al1) = self.nodes[n1]
         (l2, b2, al2) = self.nodes[n2]
         dist = Abstand(l1,b1,l2,b2)
-        self.edges += [(n1,n2,dist)]
+        self.edges.append((n1,n2,dist))
         self.nodes[n1] = (l1,b1,al1+[(n1,n2,dist)])#hier vllt den index statt edge selbst
         return (l1,b1,l2,b2)
     def num_nodes(self):
