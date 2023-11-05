@@ -28,9 +28,10 @@ def ReadCSV(G):
             # nichtmal geschafft linie zu machen ):
             # painter.drawLine(*umrechnen(x1, y1), *umrechnen(x2, y2))
 
-def Dijksrtra(G, s, t):
+def Dijkstra(G, s, t):
     # 0 weiß ,1 grau,2 schwarz
     S = []
+    visitedEdges = []
     for i in range(G.num_nodes()):
         G.set_node_value(i, (0, math.inf, []))
     P = PQueue()
@@ -40,7 +41,7 @@ def Dijksrtra(G, s, t):
         _, _, path = G.node_value(n)
         G.set_node_value(n, (2, dist, path))
         if n == t:
-            return path
+            return path, visitedEdges
         for (a, b, edge_dist) in G.out_edges(n):
             (c, node_dist, _) = G.node_value(b)
             if c == 2:
@@ -48,10 +49,11 @@ def Dijksrtra(G, s, t):
             elif (c == 0):
                 P.push(b, dist + edge_dist)
                 G.set_node_value(b, (1, dist + edge_dist, path + [(a, b)]))
+                visitedEdges.append((a, b))
             elif (dist + edge_dist < node_dist):
                 P.decrease_Key(b, dist + edge_dist)
                 G.set_node_value(b, (1, dist + edge_dist, path + [(a, b)]))
-
+                visitedEdges.append((a, b))
 
 
 class Window(QWidget, object):
@@ -191,13 +193,13 @@ class Window(QWidget, object):
         if self.timesClicked == 0:
             self.firstNode = nearest_node
             self.mappainter.setBrush(QColor(255, 0, 0))
-            self.mappainter.drawEllipse(node_x, self.height - node_y, 5, 5)
+            self.mappainter.drawEllipse(node_x, self.height - node_y, 7, 7)
             self.display.setPixmap(QPixmap.fromImage(self.world_img))
             self.timesClicked = 1
         elif self.timesClicked == 1:
             self.secondNode = nearest_node
             self.mappainter.setBrush(QColor(0, 255, 0))
-            self.mappainter.drawEllipse(node_x,  self.height - node_y, 5, 5)
+            self.mappainter.drawEllipse(node_x,  self.height - node_y, 7, 7)
             self.display.setPixmap(QPixmap.fromImage(self.world_img))
             self.timesClicked = 2
             # Jetzt Djikstra
@@ -221,11 +223,11 @@ class Window(QWidget, object):
         ##Djikstra
         first_node_index = self.G.nodes.index(self.firstNode)
         second_node_index = self.G.nodes.index(self.secondNode)
-        self.dijPath = Dijksrtra(self.G, first_node_index, second_node_index)
+        self.dijPath, self.visitedEdges = Dijkstra(self.G, first_node_index, second_node_index)
         print(str(self.dijPath))
 
-
-        for edge in self.dijPath:
+        # alle besuchten Kanten rot markieren
+        for edge in self.visitedEdges:
             node_out = self.G.nodes[edge[0]]
             node_in = self.G.nodes[edge[1]]
 
@@ -233,8 +235,21 @@ class Window(QWidget, object):
             x2, y2 = self.umrechnen(node_in[0], node_in[1])
 
             self.mappainter.setBrush(QColor(255, 0, 0))
-            self.mappainter.setPen(QPen(QColor(255, 0, 0), 2))  # Stiftbreite 2
+            self.mappainter.setPen(QPen(QColor(255, 0, 0), 1))
             self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
+
+        # den gefundenen Pfad blau markieren
+        for edge in self.dijPath:
+            node_out = self.G.nodes[edge[0]]
+            node_in = self.G.nodes[edge[1]]
+
+            x1, y1 = self.umrechnen(node_out[0], node_out[1])
+            x2, y2 = self.umrechnen(node_in[0], node_in[1])
+
+            self.mappainter.setBrush(QColor(0, 0, 255))
+            self.mappainter.setPen(QPen(QColor(0, 0, 255), 2))  # Stiftbreite 2
+            self.mappainter.drawLine(x1, self.height - y1, x2, self.height - y2)
+
 
 
 
