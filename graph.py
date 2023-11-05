@@ -24,8 +24,10 @@ class PQueue:
         self.first += 1
         return self.items[self.first-1]
 
-def Abstand(l1,b1,l2,b2):#ohne erde
-    return math.sqrt((l1-l2)**2+(b1-b2)**2)
+def Abstand(l1,b1,l2,b2):
+    b = 111.3*math.cos((b1+b2)*math.pi/360)
+    return math.sqrt((b*(l1-l2))**2+(111.3 *(b1-b2))**2)
+    #return math.sqrt((l1-l2)**2+(b1-b2)**2)
 
 class Graph:
     def __init__(self):
