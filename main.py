@@ -47,6 +47,33 @@ def Dijkstra(G, s, t):
                 G.set_node_value(b, (1, dist + edge_dist, path + [(a, b)]))
                 visitedEdges.append((a, b))
 
+def Dijkstra2(G, s, t):
+    # 0 weiß ,1 grau,2 schwarz
+    S = []
+    visitedEdges = []
+    for i in range(G.num_nodes()):
+        G.set_node_value(i, (0, math.inf, []))
+    P = PQueue()
+    P.push(s, 0)
+    while True:
+        (n, dist) = P.pop_min()
+        _, _, path = G.node_value(n)
+        G.set_node_value(n, (2, dist, path))
+        if n == t:
+            return path, visitedEdges
+        for (a, b, edge_dist) in G.out_edges(n):
+            (c, node_dist, _) = G.node_value(b)
+            h = Abstand(*G.nodes[b][0:2], *G.nodes[t][0:2])-Abstand(*G.nodes[a][0:2], *G.nodes[t][0:2])
+            if c == 2:
+                continue
+            elif (c == 0):
+                P.push(b, dist + edge_dist + h)
+                G.set_node_value(b, (1, dist + edge_dist+h, path + [(a, b)]))
+                visitedEdges.append((a, b))
+            elif (dist + edge_dist + h < node_dist):
+                P.decrease_Key(b, dist + edge_dist + h)
+                G.set_node_value(b, (1, dist + edge_dist+h, path + [(a, b)]))
+                visitedEdges.append((a, b))
 
 class Window(QWidget, object):
     def __init__(self):
