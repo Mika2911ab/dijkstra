@@ -9,3 +9,8 @@ Mit einer grafischen Oberfläche (PyQt5) können zwei Punkte auf einer Karte aus
 - Visualisierung der **besuchten Kanten** (rot) und des **finalen Pfads** (blau).
 - **Slider-Steuerung**, um den Suchprozess interaktiv zurückzuverfolgen.
 - Datenimport von **Nodes und Edges** aus CSV-Dateien.
+- 
+## Contributors
+- [Mikael Alves Brito](https://github.com/Mika2911ab)
+- [Viktor Lehnhausen](https://github.com/vlehnhau)
+- Dominik Lankeit
